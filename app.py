@@ -7,6 +7,7 @@ the socket event handlers are inside of socket_routes.py
 from flask import Flask, render_template, request, abort, url_for
 from flask_socketio import SocketIO
 import db
+import hashlib
 import secrets
 
 # import logging
@@ -43,11 +44,15 @@ def login_user():
     username = request.json.get("username")
     password = request.json.get("password")
 
+    hash_object = hashlib.sha256()
+    hash_object.update(password.encode())
+    pwdHash = hash_object.hexdigest()
+
     user =  db.get_user(username)
     if user is None:
         return "Error: User does not exist!"
 
-    if user.password != str(hash(password)):
+    if user.password != str(pwdHash):
         return "Error: Password does not match!"
 
     return url_for('home', username=request.json.get("username"))
@@ -66,7 +71,12 @@ def signup_user():
     password = request.json.get("password")
 
     if db.get_user(username) is None:
-        db.insert_user(username, str(hash(password)))
+
+        hash_object = hashlib.sha256()
+        hash_object.update(password.encode())
+        pwdHash = hash_object.hexdigest()
+
+        db.insert_user(username, str(pwdHash))
         return url_for('home', username=username)
     return "Error: User already exists!"
 
