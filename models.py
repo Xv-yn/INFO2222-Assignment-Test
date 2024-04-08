@@ -30,6 +30,7 @@ class User(Base):
     # in other words we've mapped the username Python object property to an SQL column of type String 
     username: Mapped[str] = mapped_column(String, primary_key=True)
     password: Mapped[str] = mapped_column(String)
+    salt = []
     friends = ['test1', 'test2']
     requestsReceived = []
     requestsSent = []

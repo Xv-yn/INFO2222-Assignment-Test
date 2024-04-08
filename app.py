@@ -44,16 +44,19 @@ def login_user():
     username = request.json.get("username")
     password = request.json.get("password")
 
+    user = db.get_user(username)
+
+    password = password + user.salt[0]
+
     hash_object = hashlib.sha256()
     hash_object.update(password.encode())
     pwdHash = hash_object.hexdigest()
 
-    user =  db.get_user(username)
     if user is None:
         return "Error: User does not exist!"
 
     if user.password != str(pwdHash):
-        return "Error: Password does not match!"
+        return f"Error: Password does not match!"
 
     return url_for('home', username=request.json.get("username"))
 
@@ -69,6 +72,8 @@ def signup_user():
         abort(404)
     username = request.json.get("username")
     password = request.json.get("password")
+    salt = secrets.token_bytes(16)
+    password = password + str(salt)
 
     if db.get_user(username) is None:
 
@@ -76,7 +81,7 @@ def signup_user():
         hash_object.update(password.encode())
         pwdHash = hash_object.hexdigest()
 
-        db.insert_user(username, str(pwdHash))
+        db.insert_user(username, str(pwdHash), str(salt))
         return url_for('home', username=username)
     return "Error: User already exists!"
 
