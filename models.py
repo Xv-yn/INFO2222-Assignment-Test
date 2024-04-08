@@ -31,9 +31,9 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, primary_key=True)
     password: Mapped[str] = mapped_column(String)
     salt: Mapped[str] = mapped_column(String)
-    friends = ['test1', 'test2']
-    requestsReceived = []
-    requestsSent = []
+    friends = Mapped[str] = mapped_column(JSON, default=list)
+    requestsReceived = Mapped[str] = mapped_column(JSON, default=list)
+    requestsSent = Mapped[str] = mapped_column(JSON, default=list)
     
 
 # stateful counter used to generate the room id
