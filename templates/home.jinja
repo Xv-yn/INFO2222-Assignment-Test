@@ -169,10 +169,6 @@
         box.append(child);
     }
 
-    function getFriend() {
-        socket.emit("getFriend", username)
-    }
-
     function friendRequest() {
         let requestee = $("#requestee").val();
         $("#requestee").val("");
