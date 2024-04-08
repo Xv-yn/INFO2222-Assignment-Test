@@ -31,7 +31,8 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, primary_key=True)
     password: Mapped[str] = mapped_column(String)
     friends = ['test1', 'test2']
-    requests = []
+    requestsReceived = []
+    requestsSent = []
     
 
 # stateful counter used to generate the room id
