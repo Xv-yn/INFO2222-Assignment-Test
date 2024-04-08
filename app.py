@@ -46,7 +46,7 @@ def login_user():
 
     user = db.get_user(username)
 
-    password = password + user.salt[0]
+    password = password + user.salt
 
     hash_object = hashlib.sha256()
     hash_object.update(password.encode())
