@@ -95,7 +95,7 @@ def page_not_found(_):
 def home():
     if request.args.get("username") is None:
         abort(404)
-    return render_template("home.jinja", username=request.args.get("username"), friends = db.get_user(request.args.get("username")).friends)
+    return render_template("home.jinja", username=request.args.get("username"), friends = db.getFriends(request.args.get("username")))
 
 
 

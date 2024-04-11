@@ -89,9 +89,9 @@ def leave(username, room_id):
 
 # send friend request event handler
 @socketio.on("friendRequest")
-def friendRequest(username, requestee, room_id):
-    emit("incoming", (f"{username} has sent {requestee} a friend request.", "red"), to=room_id)
-    db.get_user(requestee).requestsReceived.append(username)
-    db.get_user(username).requestsSent.append(requestee)
+def friendRequest(sender, receiver, room_id):
+    emit("incoming", (f"{sender} has sent {receiver} a friend request.", "red"), to=room_id)
 
-    emit("incoming", (f"Friend Requests of {db.get_user(requestee).username}: {db.get_user(requestee).requestsReceived}", "red"), to=room_id)
+    db.send_request(sender, receiver)
+
+    emit("incoming", (f"Friend Requests of {db.get_user(receiver).username}: {db.getRequestsReceived(db.get_user(receiver).username)}", "red"), to=room_id)
