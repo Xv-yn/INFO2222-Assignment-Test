@@ -110,3 +110,34 @@ def acceptRequest(sender: str, receiver: str):
         sender.friends += receiver.username + ","
 
         session.commit()
+
+
+def rejectRequest(sender: str, receiver: str):
+    with Session(engine) as session:
+        sender = session.get(User, sender)
+        receiver = session.get(User, receiver)
+
+        receiverReceivedList = receiver.requestsReceived.split(",")
+        receiverReceivedList.pop()
+        senderSentList = sender.requestsSent.split(",")
+        senderSentList.pop()
+
+        temp1 = ""
+        temp2 = ""
+
+        for i in receiverReceivedList:
+            if i == sender.username:
+                receiverReceivedList.remove(sender.username)
+            else:
+                temp1 += i
+
+        for i in senderSentList:
+            if i == receiver.username:
+                senderSentList.remove(receiver.username)
+            else:
+                temp2 += i
+
+        receiver.requestsReceived = temp1
+        sender.requestsSent = temp2
+
+        session.commit()

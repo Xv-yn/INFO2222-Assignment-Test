@@ -89,7 +89,7 @@
             <div class="recievedRequest-Container">
                 <p>{{ request }}</p>
                 <button onclick = "acceptRequest('{{ request }}')">Accept</button>
-                <button>Reject</button>
+                <button onclick = "rejectRequest('{{ request }}')">Reject</button>
             </div>
         {% endfor %}
     </section>
@@ -202,6 +202,10 @@
 
     function acceptRequest(sender) {
         socket.emit("acceptRequest", username, sender, room_id);
+    }
+
+    function rejectRequest(sender) {
+        socket.emit("rejectRequest", username, sender, room_id);
     }
 </script>
 {% endblock %}

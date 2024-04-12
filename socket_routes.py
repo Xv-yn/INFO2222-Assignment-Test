@@ -148,3 +148,23 @@ def acceptRequest(receiver, sender, room_id):
         ),
         to=room_id,
     )
+
+
+@socketio.on("rejectRequest")
+def rejectRequest(receiver, sender, room_id):
+    emit(
+        "incoming",
+        (f"{receiver} has rejected {sender}'s friend request.", "red"),
+        to=room_id,
+    )
+
+    db.rejectRequest(sender, receiver)
+
+    emit(
+        "incoming",
+        (
+            f"Friend Requests of {db.get_user(receiver).username}: {db.getRequestsReceived(db.get_user(receiver).username)}",
+            "red",
+        ),
+        to=room_id,
+    )
