@@ -93,6 +93,14 @@
             </div>
         {% endfor %}
     </section>
+    <section>
+        <p class="text">Sent Requests: </p>
+        {% for request in sentList %}
+            <div>
+                <p>{{ request }}</p>
+            </div>
+        {% endfor %}
+    </section>
 </main>
 
 <script src="/static/js/libs/socket.io.min.js"></script>
