@@ -123,7 +123,15 @@ def friendRequest(sender, receiver, room_id):
     emit(
         "incoming",
         (
-            f"Friend Requests of {db.get_user(receiver).username}: {db.getRequestsReceived(db.get_user(receiver).username)}",
+            f"{db.get_user(receiver).username}'s Received Friend Requests: {db.getRequestsReceived(db.get_user(receiver).username)}",
+            "red",
+        ),
+        to=room_id,
+    )
+    emit(
+        "incoming",
+        (
+            f"{db.get_user(sender).username}'s Sent Friend Requests: {db.getRequestsSent(db.get_user(sender).username)}",
             "red",
         ),
         to=room_id,

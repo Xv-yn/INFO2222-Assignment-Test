@@ -62,7 +62,6 @@ def login_user():
 
     if user.password != str(pwdHash):
         return f"Error: Password does not match!"
-
     return url_for("home", username=request.json.get("username"))
 
 

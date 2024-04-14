@@ -49,8 +49,14 @@ def send_request(sender: str, receiver: str):
         receiver = session.get(User, receiver)
 
         if sender and receiver:
-            sender.requestsSent += receiver.username + ","
-            receiver.requestsReceived += sender.username + ","
+            if sender.requestsSent == "":
+                sender.requestsSent += receiver.username
+            else:
+                sender.requestsSent += "," + receiver.username
+            if receiver.requestsReceived == "":
+                receiver.requestsReceived += sender.username
+            else:
+                receiver.requestsReceived += "," + sender.username
 
         session.commit()
 
@@ -59,7 +65,8 @@ def getFriends(username: str):
     with Session(engine) as session:
         user = session.get(User, username)
         friendsList = user.friends.split(",")
-        friendsList.pop()
+        if len(friendsList) == 1 and friendsList[0] == "":
+            friendsList.pop()
         return friendsList
 
 
@@ -67,7 +74,8 @@ def getRequestsSent(username: str):
     with Session(engine) as session:
         user = session.get(User, username)
         requestsSentList = user.requestsSent.split(",")
-        requestsSentList.pop()
+        if len(requestsSentList) == 1 and requestsSentList[0] == "":
+            requestsSentList.pop()
         return requestsSentList
 
 
@@ -75,7 +83,8 @@ def getRequestsReceived(username: str):
     with Session(engine) as session:
         user = session.get(User, username)
         requestsReceivedList = user.requestsReceived.split(",")
-        requestsReceivedList.pop()
+        if len(requestsReceivedList) == 1 and requestsReceivedList[0] == "":
+            requestsReceivedList.pop()
         return requestsReceivedList
 
 
@@ -85,29 +94,22 @@ def acceptRequest(sender: str, receiver: str):
         receiver = session.get(User, receiver)
 
         receiverReceivedList = receiver.requestsReceived.split(",")
-        receiverReceivedList.pop()
         senderSentList = sender.requestsSent.split(",")
-        senderSentList.pop()
 
-        temp1 = ""
-        temp2 = ""
+        temp1 = list(filter(lambda x: x != sender.username, receiverReceivedList))
+        receiver.requestsReceived = ",".join(temp1)
 
-        for i in receiverReceivedList:
-            if i == sender.username:
-                receiverReceivedList.remove(sender.username)
-            else:
-                temp1 += i
+        temp2 = list(filter(lambda x: x != receiver.username, senderSentList))
+        sender.requestsSent = ",".join(temp2)
 
-        for i in senderSentList:
-            if i == receiver.username:
-                senderSentList.remove(receiver.username)
-            else:
-                temp2 += i
-
-        receiver.requestsReceived = temp1
-        receiver.friends += sender.username + ","
-        sender.requestsSent = temp2
-        sender.friends += receiver.username + ","
+        if receiver.friends == "":
+            receiver.friends += sender.username
+        else:
+            receiver.friends += "," + sender.username
+        if sender.friends == "":
+            sender.friends += receiver.username
+        else:
+            sender.friends += "," + receiver.username
 
         session.commit()
 
@@ -118,26 +120,12 @@ def rejectRequest(sender: str, receiver: str):
         receiver = session.get(User, receiver)
 
         receiverReceivedList = receiver.requestsReceived.split(",")
-        receiverReceivedList.pop()
         senderSentList = sender.requestsSent.split(",")
-        senderSentList.pop()
 
-        temp1 = ""
-        temp2 = ""
+        temp1 = list(filter(lambda x: x != sender.username, receiverReceivedList))
+        receiver.requestsReceived = ",".join(temp1)
 
-        for i in receiverReceivedList:
-            if i == sender.username:
-                receiverReceivedList.remove(sender.username)
-            else:
-                temp1 += i
-
-        for i in senderSentList:
-            if i == receiver.username:
-                senderSentList.remove(receiver.username)
-            else:
-                temp2 += i
-
-        receiver.requestsReceived = temp1
-        sender.requestsSent = temp2
+        temp2 = list(filter(lambda x: x != receiver.username, senderSentList))
+        sender.requestsSent = ",".join(temp2)
 
         session.commit()
