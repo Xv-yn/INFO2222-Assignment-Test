@@ -66,24 +66,24 @@
 
     <!-- The (message) input box is set to display: none initially, 
     this means the input box is "invisible" initially-->
-    <section id="input_box" style="display: none" >
+    <section id="input_box" style="display: none">
         <p class="text">Message: </p>
         <input id="message" placeholder="message">
         <button onclick="send()">Send</button>
         <button onclick="leave()">Leave Room</button>
     </section>
-    <section>
+    <section id="friendRequest" style="display: none">
         <p class="text">Username: </p>
         <input id="requestee" placeholder="Username">
         <button onclick="friendRequest()">Send Friend Request</button>
     </section>
-    <section>
+    <section id="friendList" style="display: none">
         <p class="text">Friends List: </p>
         {% for friend in friends %}
-            <button>{{friend}}</button>
+            <button onclick="join_room_button('{{friend}}')"">{{friend}}</button>
         {% endfor %}
     </section>
-    <section>
+    <section id="receivedList" style="display: none">
         <p class="text">Received Requests: </p>
         {% for request in receivedList %}
             <div class="recievedRequest-Container">
@@ -93,7 +93,7 @@
             </div>
         {% endfor %}
     </section>
-    <section>
+    <section id="sentList" style="display: none">
         <p class="text">Sent Requests: </p>
         {% for request in sentList %}
             <div>
@@ -135,6 +135,10 @@
         // we'll display the message box, instead of the "Chat with: " box
         $("#chat_box").hide();
         $("#input_box").show();
+        $("#friendRequest").show();
+        $("#friendList").show();
+        $("#receivedList").show();
+        $("#sentList").show();
         room_id = parseInt(Cookies.get("room_id"));
     })
     
@@ -181,6 +185,31 @@
             // now we'll show the input box, so the user can input their message
             $("#chat_box").hide();
             $("#input_box").show();
+            $("#friendRequest").show();
+            $("#friendList").show();
+            $("#receivedList").show();
+            $("#sentList").show();
+        });
+     
+    }
+
+    function join_room_button(friend) {
+       
+        let receiver = friend;
+
+        // pass in the receiver of our message to the server
+        // as well as the current user's username
+        socket.emit("join", username, receiver, (res) => {
+            // res is a string with the error message if the error occurs
+            // this is a pretty bad way of doing error handling, but watevs
+            if (typeof res != "number") {
+                alert(res);
+                return;
+            }
+
+            // set the room id variable to the room id returned by the server
+            room_id = res;
+            Cookies.set("room_id", room_id);
         });
      
     }
@@ -190,8 +219,12 @@
     function leave() {
         Cookies.remove("room_id");
         socket.emit("leave", username, room_id);
-        $("#input_box").hide();
         $("#chat_box").show();
+        $("#input_box").hide();
+        $("#friendRequest").hide();
+        $("#friendList").hide();
+        $("#receivedList").hide();
+        $("#sentList").hide();
     }
 
     // function to add a message to the message box

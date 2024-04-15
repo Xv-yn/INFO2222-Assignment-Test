@@ -71,7 +71,7 @@ def join(sender_name, receiver_name):
         # emit to everyone in the room except the sender
         emit(
             "incoming",
-            (f"{sender_name} has joined the room.", "green"),
+            (f"{sender_name} has joined the room {room_id}.", "green"),
             to=room_id,
             include_self=False,
         )
@@ -79,7 +79,7 @@ def join(sender_name, receiver_name):
         emit(
             "incoming",
             (
-                f"{sender_name} has joined the room. Now talking to {receiver_name}.",
+                f"{sender_name} has joined the room {room_id}. Now talking to {receiver_name}.",
                 "green",
             ),
         )
@@ -93,7 +93,7 @@ def join(sender_name, receiver_name):
     emit(
         "incoming",
         (
-            f"{sender_name} has joined the room. Now talking to {receiver_name}.",
+            f"{sender_name} has joined the room {room_id}. Now talking to {receiver_name}.",
             "green",
         ),
         to=room_id,
