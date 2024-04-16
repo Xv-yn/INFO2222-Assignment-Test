@@ -6,6 +6,7 @@ the socket event handlers are inside of socket_routes.py
 
 import hashlib
 import secrets
+import ssl
 
 from flask import Flask, abort, render_template, request, url_for
 from flask_socketio import SocketIO
@@ -107,5 +108,10 @@ def home():
     )
 
 
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+ssl_context.load_cert_chain(
+    "certs/info2222.test.crt", "certs/info2222.test.key", "password"
+)
+
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host="127.0.0.1", port=8000, ssl_context=ssl_context)
