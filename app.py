@@ -52,14 +52,14 @@ def login_user():
 
     user = db.get_user(username)
 
+    if user is None:
+        return "Error: User does not exist!"
+
     password = password + user.salt
 
     hash_object = hashlib.sha256()
     hash_object.update(password.encode())
     pwdHash = hash_object.hexdigest()
-
-    if user is None:
-        return "Error: User does not exist!"
 
     if user.password != str(pwdHash):
         return f"Error: Password does not match!"
