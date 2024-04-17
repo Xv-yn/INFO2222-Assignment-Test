@@ -45,7 +45,11 @@ def disconnect():
 # send message event handler
 @socketio.on("send")
 def send(username, message, room_id):
-    emit("incoming", (f"{username}: {message}"), to=room_id)
+    formatted_message = f"{username}: {message}"
+
+    room.add_message(room_id, formatted_message)
+
+    emit("incoming", formatted_message, to=room_id)
 
 
 # join room event handler
@@ -83,6 +87,8 @@ def join(sender_name, receiver_name):
                 "green",
             ),
         )
+        for message in room.get_messages(room_id):
+            emit("incoming", message, to=room_id)
         return room_id
 
     # if the user isn't inside of any room,
