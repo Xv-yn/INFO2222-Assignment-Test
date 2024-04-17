@@ -161,7 +161,7 @@
         let message = $("#message").val();
         $("#message").val("");
         socket.emit("send", username, message, room_id);
-    } 
+    }
 
     // we emit a join room event to the server to join a room
     function join_room() {

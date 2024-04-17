@@ -79,11 +79,18 @@ def signup_user():
         abort(404)
     username = request.json.get("username")
     password = request.json.get("password")
-    salt = request.json.get("salt")
+
+    salt = secrets.token_bytes(16)
+
+    password += str(salt)
+
+    hash_object = hashlib.sha256()
+    hash_object.update(password.encode())
+    pwdHash = hash_object.hexdigest()
 
     if db.get_user(username) is None:
 
-        db.insert_user(username, password, salt)
+        db.insert_user(username, pwdHash, str(salt))
         return url_for("home", username=username)
     return "Error: User already exists!"
 
