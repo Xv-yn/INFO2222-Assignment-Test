@@ -7,8 +7,9 @@ the socket event handlers are inside of socket_routes.py
 import hashlib
 import secrets
 import ssl
+from functools import wraps
 
-from flask import Flask, abort, render_template, request, url_for
+from flask import Flask, abort, redirect, render_template, request, session, url_for
 from flask_socketio import SocketIO
 
 import db
@@ -23,6 +24,12 @@ app = Flask(__name__)
 
 # secret key used to sign the session cookie
 app.config["SECRET_KEY"] = secrets.token_hex()
+
+app.config.update(
+    SESSION_COOKIE_SECURE=True,  # Ensure cookies are sent over HTTPS
+    SESSION_COOKIE_HTTPONLY=True,  # Prevent client-side JavaScript from accessing the cookie
+)
+
 socketio = SocketIO(app)
 
 # don't remove this!!
@@ -63,6 +70,9 @@ def login_user():
 
     if user.password != str(pwdHash):
         return f"Error: Password does not match!"
+
+    session["username"] = user.username
+    session["logged_in"] = True
     return url_for("home", username=request.json.get("username"))
 
 
@@ -101,11 +111,28 @@ def page_not_found(_):
     return render_template("404.jinja"), 404
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "logged_in" not in session or not session["logged_in"]:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 # home page, where the messaging app is
 @app.route("/home")
+@login_required
 def home():
     if request.args.get("username") is None:
         abort(404)
+
+    session_username = session.get("username")
+    requested_username = request.args.get("username")
+    if session_username is None or session_username != requested_username:
+        abort(404)
+
     return render_template(
         "home.jinja",
         username=request.args.get("username"),

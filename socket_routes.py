@@ -3,7 +3,7 @@ socket_routes
 file containing all the routes related to socket.io
 """
 
-from flask import request
+from flask import request, session
 from flask_socketio import emit, join_room, leave_room
 
 try:
@@ -21,6 +21,9 @@ room = Room()
 # this event is emitted when the io() function is called in JS
 @socketio.on("connect")
 def connect():
+    if not session.get("logged_in"):
+        return False
+
     username = request.cookies.get("username")
     room_id = request.cookies.get("room_id")
     if room_id is None or username is None:
