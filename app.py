@@ -100,7 +100,7 @@ def signup_user():
 
     if db.get_user(username) is None:
 
-        db.insert_user(username, pwdHash, str(salt))
+        db.insert_user(username, str(pwdHash), str(salt))
         return url_for("home", username=username)
     return "Error: User already exists!"
 
