@@ -92,6 +92,9 @@ def signup_user():
 
     salt = secrets.token_bytes(16)
 
+    if len(username.split(",")) > 1:
+        return "Error: Invalid Username!"
+
     password += str(salt)
 
     hash_object = hashlib.sha256()
