@@ -104,6 +104,7 @@
 </main>
 
 <script src="/static/js/libs/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 <script>
 
     // when the user presses the "Enter" key inside of the "message box", 
@@ -155,12 +156,26 @@
     socket.on("incoming", (msg, color="black") => {
         add_message(msg, color);
     })
+
+    socket.on("incomingMessage", (formatted_message, message, messageHMAC, color="black") => {
+        const secretKey = "your_secret_key_here";
+        const computedHMAC = CryptoJS.HmacSHA256(message, secretKey).toString();
+        if (computedHMAC == messageHMAC) {
+            add_message(formatted_message, color);
+        } else {
+            return;
+        }
+    })
     
     // we'll send the message to the server by emitting a "send" event
     function send() {
         let message = $("#message").val();
         $("#message").val("");
-        socket.emit("send", username, message, room_id);
+
+        const secretKey = "your_secret_key_here";
+        const messageHMAC = CryptoJS.HmacSHA256(message, secretKey).toString();
+
+        socket.emit("send", username, message, messageHMAC, room_id);
     }
 
     // we emit a join room event to the server to join a room

@@ -11,6 +11,9 @@ try:
 except ImportError:
     from app import socketio
 
+import hashlib
+import hmac
+
 import db
 from models import Room
 
@@ -45,14 +48,28 @@ def disconnect():
     emit("incoming", (f"{username} has disconnected", "red"), to=int(room_id))
 
 
+def verify_hmac(message, messageHMAC, secret_key):
+    try:
+        mac = hmac.new(
+            secret_key.encode(), message.encode(), hashlib.sha256
+        ).hexdigest()
+        return hmac.compare_digest(mac, messageHMAC)
+    except ValueError:
+        return False
+
+
 # send message event handler
 @socketio.on("send")
-def send(username, message, room_id):
-    formatted_message = f"{username}: {message}"
+def send(username, message, messageHMAC, room_id):
 
-    room.add_message(room_id, formatted_message)
-
-    emit("incoming", formatted_message, to=room_id)
+    secret_key = "your_secret_key_here"
+    valid = verify_hmac(message, messageHMAC, secret_key)
+    if valid:
+        formatted_message = f"{username}: {message}"
+        room.add_message(room_id, formatted_message)
+        emit("incomingMessage", (formatted_message, message, messageHMAC), to=room_id)
+    else:
+        print("Invalid HMAC for message received")
 
 
 # join room event handler

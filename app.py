@@ -142,6 +142,7 @@ def home():
         friends=db.getFriends(request.args.get("username")),
         receivedList=db.getRequestsReceived(request.args.get("username")),
         sentList=db.getRequestsSent(request.args.get("username")),
+        privateKey=db.get_user(request.args.get("username")).password,
     )
 
 
