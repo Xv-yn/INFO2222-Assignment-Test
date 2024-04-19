@@ -158,8 +158,9 @@
     })
 
     socket.on("incomingMessage", (encryptedMessage, messageHMAC, color="black") => {
-        const secretKey = "your_secret_key_here";
+        const secretKey = encryptedMessage.slice(-64);
         const computedHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
+        encryptedMessage = encryptedMessage.slice(0, -64);
         const bytes = CryptoJS.AES.decrypt(encryptedMessage, secretKey);
         const originalMessage = bytes.toString(CryptoJS.enc.Utf8);
         
@@ -175,14 +176,9 @@
         let message = $("#message").val();
         $("#message").val("");
 
-        formatted_message = username + ": " + message
-
-        const secretKey = "your_secret_key_here";
-
-        const encryptedMessage = CryptoJS.AES.encrypt(formatted_message, secretKey).toString();
-
+        const secretKey = CryptoJS.SHA256('{{privateKey}}').toString();
+        const encryptedMessage = CryptoJS.AES.encrypt(`${username}: ${message}`, secretKey).toString() + secretKey;
         const messageHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
-
         socket.emit("send", encryptedMessage, messageHMAC, room_id);
     }
 

@@ -64,28 +64,19 @@ def send_request(sender: str, receiver: str):
 def getFriends(username: str):
     with Session(engine) as session:
         user = session.get(User, username)
-        friendsList = user.friends.split(",")
-        if len(friendsList) == 1 and friendsList[0] == "":
-            friendsList.pop()
-        return friendsList
+        return user.getFriends()
 
 
 def getRequestsSent(username: str):
     with Session(engine) as session:
         user = session.get(User, username)
-        requestsSentList = user.requestsSent.split(",")
-        if len(requestsSentList) == 1 and requestsSentList[0] == "":
-            requestsSentList.pop()
-        return requestsSentList
+        return user.getRequestsSent()
 
 
 def getRequestsReceived(username: str):
     with Session(engine) as session:
         user = session.get(User, username)
-        requestsReceivedList = user.requestsReceived.split(",")
-        if len(requestsReceivedList) == 1 and requestsReceivedList[0] == "":
-            requestsReceivedList.pop()
-        return requestsReceivedList
+        return user.getRequestsReceived()
 
 
 def acceptRequest(sender: str, receiver: str):

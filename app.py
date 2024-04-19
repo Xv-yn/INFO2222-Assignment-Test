@@ -26,8 +26,8 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = secrets.token_hex()
 
 app.config.update(
-    SESSION_COOKIE_SECURE=True,  # Ensure cookies are sent over HTTPS
-    SESSION_COOKIE_HTTPONLY=True,  # Prevent client-side JavaScript from accessing the cookie
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
 )
 
 socketio = SocketIO(app)
@@ -128,21 +128,24 @@ def login_required(f):
 @app.route("/home")
 @login_required
 def home():
-    if request.args.get("username") is None:
-        abort(404)
 
     session_username = session.get("username")
     requested_username = request.args.get("username")
-    if session_username is None or session_username != requested_username:
+    if request.args.get("username") is None:
         abort(404)
+
+    if session_username is None or session_username != requested_username:
+        return redirect(url_for("login"))
+
+    user = db.get_user(requested_username)
 
     return render_template(
         "home.jinja",
-        username=request.args.get("username"),
-        friends=db.getFriends(request.args.get("username")),
-        receivedList=db.getRequestsReceived(request.args.get("username")),
-        sentList=db.getRequestsSent(request.args.get("username")),
-        privateKey=db.get_user(request.args.get("username")).password,
+        username=requested_username,
+        friends=user.getFriends(),
+        receivedList=user.getRequestsReceived(),
+        sentList=user.getRequestsSent(),
+        privateKey=user.password,
     )
 
 

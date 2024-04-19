@@ -38,6 +38,24 @@ class User(Base):
     requestsReceived: Mapped[str] = mapped_column(String)
     requestsSent: Mapped[str] = mapped_column(String)
 
+    def getFriends(self):
+        friendsList = self.friends.split(",")
+        if len(friendsList) == 1 and friendsList[0] == "":
+            friendsList.pop()
+        return friendsList
+
+    def getRequestsSent(self):
+        requestsSentList = self.requestsSent.split(",")
+        if len(requestsSentList) == 1 and requestsSentList[0] == "":
+            requestsSentList.pop()
+        return requestsSentList
+
+    def getRequestsReceived(self):
+        requestsReceivedList = self.requestsReceived.split(",")
+        if len(requestsReceivedList) == 1 and requestsReceivedList[0] == "":
+            requestsReceivedList.pop()
+        return requestsReceivedList
+
 
 # stateful counter used to generate the room id
 class Counter:
