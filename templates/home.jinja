@@ -157,11 +157,14 @@
         add_message(msg, color);
     })
 
-    socket.on("incomingMessage", (formatted_message, message, messageHMAC, color="black") => {
+    socket.on("incomingMessage", (encryptedMessage, messageHMAC, color="black") => {
         const secretKey = "your_secret_key_here";
-        const computedHMAC = CryptoJS.HmacSHA256(message, secretKey).toString();
+        const computedHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
+        const bytes = CryptoJS.AES.decrypt(encryptedMessage, secretKey);
+        const originalMessage = bytes.toString(CryptoJS.enc.Utf8);
+        
         if (computedHMAC == messageHMAC) {
-            add_message(formatted_message, color);
+            add_message(originalMessage, color);
         } else {
             return;
         }
@@ -172,10 +175,15 @@
         let message = $("#message").val();
         $("#message").val("");
 
-        const secretKey = "your_secret_key_here";
-        const messageHMAC = CryptoJS.HmacSHA256(message, secretKey).toString();
+        formatted_message = username + ": " + message
 
-        socket.emit("send", username, message, messageHMAC, room_id);
+        const secretKey = "your_secret_key_here";
+
+        const encryptedMessage = CryptoJS.AES.encrypt(formatted_message, secretKey).toString();
+
+        const messageHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
+
+        socket.emit("send", encryptedMessage, messageHMAC, room_id);
     }
 
     // we emit a join room event to the server to join a room

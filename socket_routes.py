@@ -60,14 +60,13 @@ def verify_hmac(message, messageHMAC, secret_key):
 
 # send message event handler
 @socketio.on("send")
-def send(username, message, messageHMAC, room_id):
+def send(formatted_message, messageHMAC, room_id):
 
     secret_key = "your_secret_key_here"
-    valid = verify_hmac(message, messageHMAC, secret_key)
+    valid = verify_hmac(formatted_message, messageHMAC, secret_key)
     if valid:
-        formatted_message = f"{username}: {message}"
         room.add_message(room_id, formatted_message)
-        emit("incomingMessage", (formatted_message, message, messageHMAC), to=room_id)
+        emit("incomingMessage", (formatted_message, messageHMAC), to=room_id)
     else:
         print("Invalid HMAC for message received")
 
