@@ -170,6 +170,14 @@
             return;
         }
     })
+
+    socket.on("incomingHistory", (encryptedMessage, color="black") => {
+        const secretKey = encryptedMessage.slice(-64);
+        encryptedMessage = encryptedMessage.slice(0, -64);
+        const bytes = CryptoJS.AES.decrypt(encryptedMessage, secretKey);
+        const originalMessage = bytes.toString(CryptoJS.enc.Utf8);
+        add_message(originalMessage, color);
+    })
     
     // we'll send the message to the server by emitting a "send" event
     function send() {
