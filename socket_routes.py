@@ -101,7 +101,7 @@ def join(sender_name, receiver_name):
             ),
         )
         for message in room.get_messages(room_id):
-            emit("incomingHistory", message, to=room_id)
+            emit("incomingHistory", message)
         return room_id
 
     # if the user isn't inside of any room,
