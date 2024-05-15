@@ -37,6 +37,7 @@ class User(Base):
     friends: Mapped[str] = mapped_column(String)
     requestsReceived: Mapped[str] = mapped_column(String)
     requestsSent: Mapped[str] = mapped_column(String)
+    accessLevel: Mapped[str] = mapped_column(String)
 
     def getFriends(self):
         friendsList = self.friends.split(",")

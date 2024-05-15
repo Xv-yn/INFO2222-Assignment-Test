@@ -160,3 +160,13 @@ def rejectRequest(receiver, sender, room_id):
     )
 
     db.rejectRequest(sender, receiver)
+
+
+@socketio.on("removeFriend")
+def removeFriend(username, friend):
+    db.removeFriend(username, friend)
+
+
+@socketio.on("setRole")
+def removeFriend(username, role):
+    db.setRole(username, role)

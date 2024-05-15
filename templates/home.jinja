@@ -39,6 +39,13 @@
         margin-right: 5px;
     }
 
+    .message {
+        margin: 0 35px;
+        background-color: #f6f6f6;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
 </style>
 
 <!--Navbar, you'll see the username here-->
@@ -100,6 +107,19 @@
                 <p>{{ request }}</p>
             </div>
         {% endfor %}
+    </section>
+    <section id="removeFriends">
+        <p class="text">Remove Friend: </p>
+        {% for friend in friends %}
+            <button onclick="removeFriend('{{friend}}')">{{friend}}</button>
+        {% endfor %}
+    </section>
+    <section id="accountType">
+        <p class="text">Account Type: </p>
+        <button onclick="setRole('student')">Student</button>
+        <button onclick="setRole('Academics')">Staff: Academics</button>
+        <button onclick="setRole('Administrative')">Staff: Administrative</button>
+        <button onclick="setRole('Admin')">Staff: Admin</button>
     </section>
 </main>
 
@@ -265,7 +285,7 @@
     // called when an incoming message has reached a client
     function add_message(message, color) {
         let box = $("#message_box");
-        let child = $(`<p style="color:${color}; margin: 0px;"></p>`).text(message);
+        let child = $(`<p class = "message"; style="color:${color}; margin: 0px;"></p>`).text(message);
         box.append(child);
     }
 
@@ -281,6 +301,14 @@
 
     function rejectRequest(sender) {
         socket.emit("rejectRequest", username, sender, room_id);
+    }
+
+    function removeFriend(friend) {
+        socket.emit("removeFriend", username, friend);
+    }
+
+    function setRole(role) {
+        socket.emit("setRole", username, role);
     }
 </script>
 {% endblock %}

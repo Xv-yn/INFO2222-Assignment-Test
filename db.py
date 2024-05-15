@@ -32,6 +32,7 @@ def insert_user(username: str, password: str, salt: str):
             friends="",
             requestsReceived="",
             requestsSent="",
+            accessLevel="",
         )
         session.add(user)
         session.commit()
@@ -118,5 +119,31 @@ def rejectRequest(sender: str, receiver: str):
 
         temp2 = list(filter(lambda x: x != receiver.username, senderSentList))
         sender.requestsSent = ",".join(temp2)
+
+        session.commit()
+
+
+def removeFriend(user: str, friend: str):
+    with Session(engine) as session:
+        user = session.get(User, user)
+        friend = session.get(User, friend)
+
+        friendFriendList = friend.friends.split(",")
+        userFriendList = user.friends.split(",")
+
+        temp1 = list(filter(lambda x: x != user.username, friendFriendList))
+        friend.friends = ",".join(temp1)
+
+        temp2 = list(filter(lambda x: x != friend.username, userFriendList))
+        user.friends = ",".join(temp2)
+
+        session.commit()
+
+
+def setRole(username: str, role: str):
+    with Session(engine) as session:
+        user = session.get(User, username)
+
+        user.accessLevel = role
 
         session.commit()
