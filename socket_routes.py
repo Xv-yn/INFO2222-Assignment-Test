@@ -180,3 +180,8 @@ def deleteMessage(message, room_id):
 @socketio.on("muteUser")
 def muteUser(message, room_id):
     db.muteUser(message, room_id)
+
+
+@socketio.on("unmuteUser")
+def unmuteUser(message, room_id):
+    db.unmuteUser(message, room_id)

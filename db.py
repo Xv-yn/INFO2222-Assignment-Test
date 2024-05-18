@@ -157,3 +157,12 @@ def muteUser(username: str, room_id: int):
         user.muteStatus = "muted"
 
         session.commit()
+
+
+def unmuteUser(username: str, room_id: int):
+    with Session(engine) as session:
+        user = session.get(User, username)
+
+        user.muteStatus = "unmuted"
+
+        session.commit()

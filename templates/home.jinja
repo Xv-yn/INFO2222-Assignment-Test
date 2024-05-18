@@ -327,13 +327,17 @@
 
         const username = extractUsername(message);
 
-        let displayDelete = '{{ accessLevel }}' === "Admin" || '{{ accessLevel }}' === "Academics" || '{{ accessLevel }}' === "Administrative" ? "inline" : "none";
+        let displayStatus = '{{ accessLevel }}' === "Admin" || '{{ accessLevel }}' === "Academics" || '{{ accessLevel }}' === "Administrative" ? "inline" : "none";
+        let muteDisplay = '{{ muteStatus }}' === "muted" ? "none" : "inline";
+        let finalDisplayStatus = (displayStatus === "inline" && muteDisplay === "inline") ? "inline" : "none";
+        let unmuteStatus = (displayStatus === "inline" && muteDisplay === "none") ? "inline" : "none";
 
         let messageElement = $(`<div class="message" style="color: ${color}; display: flex; align-items: center; margin: 0 35px; background-color: #f6f6f6; padding: 15px; border-radius: 12px;">
             <p id = "'${username}'"style="flex-grow: 1; margin: 0;">${message}</p>
             <button class="mark-button ${markClass}" data-message-id="${messageId}">★</button>
-            <button onclick = "deleteMessage('${encryptedMessage}')" style="display: ${displayDelete};">Delete</button>
-            <button onclick = "muteUser('${username}')" style="display: ${displayDelete};">Mute</button>
+            <button onclick = "deleteMessage('${encryptedMessage}')" style="display: ${displayStatus};">Delete</button>
+            <button onclick = "muteUser('${username}')" style="display: ${finalDisplayStatus};">Mute</button>
+            <button onclick = "unmuteUser('${username}')" style="display: ${unmuteStatus};">Unmute</button>
         </div>`);
 
         $("#message_box").append(messageElement);
@@ -385,6 +389,10 @@
 
     function muteUser(username) {
         socket.emit("muteUser", username, room_id);
+    }
+
+    function unmuteUser(username) {
+        socket.emit("unmuteUser", username, room_id);
     }
 
 </script>
