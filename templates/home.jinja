@@ -46,6 +46,24 @@
         border-radius: 12px;
     }
 
+    .unmarked {
+        color: black;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 18px;
+    }
+
+    .marked {
+        color: red;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 18px;
+    }
+
+
+
 </style>
 
 <!--Navbar, you'll see the username here-->
@@ -143,10 +161,17 @@
         }
     })
 
-
     $(document).ready(() => {
+
+        // Set up event handler for the mark button within the message box
+        $(document).ready(function() {
+            $('#message_box').on('click', '.mark-button', function() {
+                var messageId = $(this).data('message-id');
+                toggleMark(messageId, this);
+            });
+        });
         // room_id is undefined if the user hasn't joined a room
-        Cookies.get("room_id") = undefined
+        Cookies.get("room_id") = undefined;
         // we early return in this case
         if (Cookies.get("room_id") == undefined) {
             return;
@@ -161,7 +186,9 @@
         $("#receivedList").show();
         $("#sentList").show();
         room_id = parseInt(Cookies.get("room_id"));
-    })
+
+    });
+
     
     // Here's the Socket IO part of the code
     // things get a bit complicated here so brace yourselves :P
@@ -283,11 +310,20 @@
 
     // function to add a message to the message box
     // called when an incoming message has reached a client
-    function add_message(message, color) {
-        let box = $("#message_box");
-        let child = $(`<p class = "message"; style="color:${color}; margin: 0px;"></p>`).text(message);
-        box.append(child);
+    // Modify this function to include an uncolored star button next to each message
+    function add_message(message, color, messageId) {
+        // Always start each new message as unmarked
+        let markClass = 'unmarked';  // Set the class to unmarked by default
+
+        let messageElement = $(`<div class="message" style="color: ${color}; display: flex; align-items: center; margin: 0 35px; background-color: #f6f6f6; padding: 15px; border-radius: 12px;">
+            <p style="flex-grow: 1; margin: 0;">${message}</p>
+            <button class="mark-button ${markClass}" data-message-id="${messageId}">!</button>
+        </div>`);
+
+        $("#message_box").append(messageElement);
     }
+
+
 
     function friendRequest() {
         let requestee = $("#requestee").val();
@@ -310,5 +346,24 @@
     function setRole(role) {
         socket.emit("setRole", username, role);
     }
+
+    function toggleMark(messageId, element) {
+        let markedMessages = JSON.parse(localStorage.getItem('markedMessages') || '{}');
+        console.log("Before toggle - State:", markedMessages);
+
+        if (markedMessages[messageId]) {
+            delete markedMessages[messageId];
+            $(element).removeClass('marked').addClass('unmarked');
+        } else {
+            markedMessages[messageId] = true;
+            $(element).removeClass('unmarked').addClass('marked');
+        }
+
+        localStorage.setItem('markedMessages', JSON.stringify(markedMessages));
+        console.log("After toggle - Updated state:", markedMessages);
+    }
+
+
+
 </script>
 {% endblock %}
