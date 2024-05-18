@@ -147,6 +147,7 @@ def home():
         sentList=user.getRequestsSent(),
         privateKey=user.password,
         accessLevel=user.accessLevel,
+        muteStatus=user.muteStatus,
     )
 
 

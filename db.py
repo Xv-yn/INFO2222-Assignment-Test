@@ -33,6 +33,7 @@ def insert_user(username: str, password: str, salt: str):
             requestsReceived="",
             requestsSent="",
             accessLevel="Student",
+            muteStatus="unmuted",
         )
         session.add(user)
         session.commit()

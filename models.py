@@ -38,6 +38,7 @@ class User(Base):
     requestsReceived: Mapped[str] = mapped_column(String)
     requestsSent: Mapped[str] = mapped_column(String)
     accessLevel: Mapped[str] = mapped_column(String)
+    muteStatus: Mapped[str] = mapped_column(String)
 
     def getFriends(self):
         friendsList = self.friends.split(",")

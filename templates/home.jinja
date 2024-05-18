@@ -236,7 +236,10 @@
         const secretKey = CryptoJS.SHA256('{{privateKey}}').toString();
         const encryptedMessage = CryptoJS.AES.encrypt(`({{ accessLevel }}) ${username}: ${message}`, secretKey).toString() + secretKey;
         const messageHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
-        socket.emit("send", encryptedMessage, messageHMAC, room_id);
+
+        if ('{{muteStatus}}' == "unmuted") {
+            socket.emit("send", encryptedMessage, messageHMAC, room_id);
+        }
     }
 
     // we emit a join room event to the server to join a room
@@ -316,12 +319,13 @@
     function add_message(message, color, encryptedMessage, messageId) {
         let markClass = 'unmarked';
 
-        let displayDelete = '{{ accessLevel }}' === "Admin" ? "inline" : "none";
+        let displayDelete = '{{ accessLevel }}' === "Admin" || '{{ accessLevel }}' === "Academics" || '{{ accessLevel }}' === "Administrative" ? "inline" : "none";
 
         let messageElement = $(`<div class="message" style="color: ${color}; display: flex; align-items: center; margin: 0 35px; background-color: #f6f6f6; padding: 15px; border-radius: 12px;">
             <p style="flex-grow: 1; margin: 0;">${message}</p>
             <button class="mark-button ${markClass}" data-message-id="${messageId}">★</button>
             <button onclick = "deleteMessage('${encryptedMessage}')" style="display: ${displayDelete};">Delete</button>
+            <button onclick = "muteUser('${message}')" style="display: ${displayDelete};">Mute</button>
         </div>`);
 
         $("#message_box").append(messageElement);
@@ -371,7 +375,9 @@
         socket.emit("deleteMessage", message, room_id);
     }
 
-
+    function muteUser(message) {
+        socket.emit("muteUser", message, room_id);
+    }
 
 </script>
 {% endblock %}
