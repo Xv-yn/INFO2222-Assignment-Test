@@ -92,7 +92,6 @@ class Room:
             return
         del self.dict[user]
 
-    # gets the room id from a user
     def get_room_id(self, user: str):
         if user not in self.dict.keys():
             return None
@@ -105,3 +104,11 @@ class Room:
 
     def get_messages(self, room_id: int) -> List[str]:
         return self.messageHistory.get(room_id, [])
+
+    def add_message(self, room_id: int, message: str):
+        if room_id not in self.messageHistory:
+            self.messageHistory[room_id] = []
+        self.messageHistory[room_id].append(message)
+
+    def delete_message(self, room_id: int, message: str):
+        self.messageHistory[room_id].remove(message)

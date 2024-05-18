@@ -69,7 +69,7 @@
 <!--Navbar, you'll see the username here-->
 <nav style="border-bottom: 1px solid black;">
     <ol style="float: right">
-        <li style="display:inline-block">Username:  {{ username }} </li>
+        <li style="display:inline-block">Username:  {{ username }} || Role: {{ accessLevel }}</li>
     </ol>
 </nav>
 
@@ -205,6 +205,7 @@
     })
 
     socket.on("incomingMessage", (encryptedMessage, messageHMAC, color="black") => {
+        const original = encryptedMessage
         const secretKey = encryptedMessage.slice(-64);
         const computedHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
         encryptedMessage = encryptedMessage.slice(0, -64);
@@ -212,18 +213,19 @@
         const originalMessage = bytes.toString(CryptoJS.enc.Utf8);
         
         if (computedHMAC == messageHMAC) {
-            add_message(originalMessage, color);
+            add_message(originalMessage, color, original);
         } else {
             return;
         }
     })
 
     socket.on("incomingHistory", (encryptedMessage, color="black") => {
+        const original = encryptedMessage
         const secretKey = encryptedMessage.slice(-64);
         encryptedMessage = encryptedMessage.slice(0, -64);
         const bytes = CryptoJS.AES.decrypt(encryptedMessage, secretKey);
         const originalMessage = bytes.toString(CryptoJS.enc.Utf8);
-        add_message(originalMessage, color);
+        add_message(originalMessage, color, original);
     })
     
     // we'll send the message to the server by emitting a "send" event
@@ -232,7 +234,7 @@
         $("#message").val("");
 
         const secretKey = CryptoJS.SHA256('{{privateKey}}').toString();
-        const encryptedMessage = CryptoJS.AES.encrypt(`${username}: ${message}`, secretKey).toString() + secretKey;
+        const encryptedMessage = CryptoJS.AES.encrypt(`({{ accessLevel }}) ${username}: ${message}`, secretKey).toString() + secretKey;
         const messageHMAC = CryptoJS.HmacSHA256(encryptedMessage, secretKey).toString();
         socket.emit("send", encryptedMessage, messageHMAC, room_id);
     }
@@ -311,13 +313,15 @@
     // function to add a message to the message box
     // called when an incoming message has reached a client
     // Modify this function to include an uncolored star button next to each message
-    function add_message(message, color, messageId) {
-        // Always start each new message as unmarked
-        let markClass = 'unmarked';  // Set the class to unmarked by default
+    function add_message(message, color, encryptedMessage, messageId) {
+        let markClass = 'unmarked';
+
+        let displayDelete = '{{ accessLevel }}' === "Admin" ? "inline" : "none";
 
         let messageElement = $(`<div class="message" style="color: ${color}; display: flex; align-items: center; margin: 0 35px; background-color: #f6f6f6; padding: 15px; border-radius: 12px;">
             <p style="flex-grow: 1; margin: 0;">${message}</p>
-            <button class="mark-button ${markClass}" data-message-id="${messageId}">!</button>
+            <button class="mark-button ${markClass}" data-message-id="${messageId}">★</button>
+            <button onclick = "deleteMessage('${encryptedMessage}')" style="display: ${displayDelete};">Delete</button>
         </div>`);
 
         $("#message_box").append(messageElement);
@@ -361,6 +365,10 @@
 
         localStorage.setItem('markedMessages', JSON.stringify(markedMessages));
         console.log("After toggle - Updated state:", markedMessages);
+    }
+
+    function deleteMessage(message) {
+        socket.emit("deleteMessage", message, room_id);
     }
 
 

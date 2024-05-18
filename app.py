@@ -146,6 +146,7 @@ def home():
         receivedList=user.getRequestsReceived(),
         sentList=user.getRequestsSent(),
         privateKey=user.password,
+        accessLevel=user.accessLevel,
     )
 
 

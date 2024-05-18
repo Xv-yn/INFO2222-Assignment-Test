@@ -170,3 +170,8 @@ def removeFriend(username, friend):
 @socketio.on("setRole")
 def removeFriend(username, role):
     db.setRole(username, role)
+
+
+@socketio.on("deleteMessage")
+def deleteMessage(message, room_id):
+    room.delete_message(room_id, message)

@@ -32,7 +32,7 @@ def insert_user(username: str, password: str, salt: str):
             friends="",
             requestsReceived="",
             requestsSent="",
-            accessLevel="",
+            accessLevel="Student",
         )
         session.add(user)
         session.commit()
