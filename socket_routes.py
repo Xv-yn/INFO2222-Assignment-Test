@@ -175,3 +175,8 @@ def removeFriend(username, role):
 @socketio.on("deleteMessage")
 def deleteMessage(message, room_id):
     room.delete_message(room_id, message)
+
+
+@socketio.on("muteUser")
+def muteUser(message, room_id):
+    db.muteUser(message, room_id)

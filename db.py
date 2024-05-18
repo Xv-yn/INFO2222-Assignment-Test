@@ -148,3 +148,12 @@ def setRole(username: str, role: str):
         user.accessLevel = role
 
         session.commit()
+
+
+def muteUser(username: str, room_id: int):
+    with Session(engine) as session:
+        user = session.get(User, username)
+
+        user.muteStatus = "muted"
+
+        session.commit()

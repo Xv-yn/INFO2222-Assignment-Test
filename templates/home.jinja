@@ -313,19 +313,27 @@
         $("#sentList").show();
     }
 
+    function extractUsername(str) {
+        const regex = /\) (.*?):/;
+        const match = str.match(regex);
+        return match ? match[1] : null;
+    }
+
     // function to add a message to the message box
     // called when an incoming message has reached a client
     // Modify this function to include an uncolored star button next to each message
     function add_message(message, color, encryptedMessage, messageId) {
         let markClass = 'unmarked';
 
+        const username = extractUsername(message);
+
         let displayDelete = '{{ accessLevel }}' === "Admin" || '{{ accessLevel }}' === "Academics" || '{{ accessLevel }}' === "Administrative" ? "inline" : "none";
 
         let messageElement = $(`<div class="message" style="color: ${color}; display: flex; align-items: center; margin: 0 35px; background-color: #f6f6f6; padding: 15px; border-radius: 12px;">
-            <p style="flex-grow: 1; margin: 0;">${message}</p>
+            <p id = "'${username}'"style="flex-grow: 1; margin: 0;">${message}</p>
             <button class="mark-button ${markClass}" data-message-id="${messageId}">★</button>
             <button onclick = "deleteMessage('${encryptedMessage}')" style="display: ${displayDelete};">Delete</button>
-            <button onclick = "muteUser('${message}')" style="display: ${displayDelete};">Mute</button>
+            <button onclick = "muteUser('${username}')" style="display: ${displayDelete};">Mute</button>
         </div>`);
 
         $("#message_box").append(messageElement);
@@ -375,8 +383,8 @@
         socket.emit("deleteMessage", message, room_id);
     }
 
-    function muteUser(message) {
-        socket.emit("muteUser", message, room_id);
+    function muteUser(username) {
+        socket.emit("muteUser", username, room_id);
     }
 
 </script>
